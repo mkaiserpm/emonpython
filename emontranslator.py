@@ -67,4 +67,4 @@ while 1:
         print e.message
         pass
         
-    #time.sleep(2)
+    time.sleep(1)
