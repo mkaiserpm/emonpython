@@ -29,20 +29,42 @@ def parseLine(linestr):
     temp = 0
     humid = 0
     voltage = 0
+    if "BAD-CRC" not in linestr:
+        if len(linestr) > 2:
+                data = linestr.split(" ")
+                print linestr
+                print data
+                nodeid = int(data[0])
+                temp = float(data[1])
+                temp = temp/ 100.
+                humid = float(data[2])
+                humid = humid / 100.
+                voltage = float(data[3])
+                voltage = voltage / 100.
     return nodeid,temp,humid,voltage
 
 while 1:
-    # Read in line of readings from serial / uart
-    linestr = ser.readline()
-    linestr = linestr.rstrip()
-    print linestr
-
-    nodeid,temp,humid,voltage=parseLine(linestr)
-    if nodeid:
-        params = ("{temp:%d,humid:%d,voltage:%d}"%(nodeid,temp,humid,voltage))
-        print params
-        # Send to emoncms
-        #conn.request("GET", "/"+emoncmspath+"/input/post.json?apikey="+apikey+"&node="+str(nodeid)+"&json="+params)
-        #response = conn.getresponse()
-        #print response.read()
-    time.sleep(2)
+    try:
+        # Read in line of readings from serial / uart
+        linestr = ser.readline()
+        linestr = linestr.rstrip()
+        #print linestr
+    
+        nodeid,temp,humid,voltage=parseLine(linestr)
+        if nodeid:
+            params = ("{temp:%.2f,humid:%.2f,voltage:%.2f}"%(temp,humid,voltage))
+            print params
+            print "nodeid:"+str(nodeid)
+            # Send to emoncms
+            conn.connect()
+            conn.request("GET", "/"+emoncmspath+"/input/post.json?&node="+str(nodeid)+"&json="+params+"&apikey="+apikey)
+            response = conn.getresponse()
+            print response.read()
+    except KeyboardInterrupt:
+        raise
+    except Exception as e:
+        print e.__doc__
+        print e.message
+        pass
+        
+    #time.sleep(2)
