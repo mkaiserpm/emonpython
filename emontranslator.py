@@ -45,4 +45,4 @@ while 1:
         #conn.request("GET", "/"+emoncmspath+"/input/post.json?apikey="+apikey+"&node="+str(nodeid)+"&json="+params)
         #response = conn.getresponse()
         #print response.read()
-    time.sleep()
+    time.sleep(2)
