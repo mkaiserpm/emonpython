@@ -1,4 +1,3 @@
-#!/usr/bin/python
 '''
 Created on 01.05.2017
 
@@ -19,12 +18,8 @@ domain = "localhost"
 emoncmspath = "emoncms"
 apikey = "2eba96e51f6b41534f52110ad063b0c8"
 
-domain2 ="piboxmet.local"
-apikey2 = "1ed78821a7e18f9b1b41ab30c3ffad0b"
-
 nodeid = 10
 conn = httplib.HTTPConnection(domain)
-conn2 = httplib.HTTPConnection(domain2)
 
 # Set this to the serial port of your emontx and baud rate, 9600 is standard emontx baud rate
 ser = serial.Serial('/dev/ttyS0', 9600)
@@ -58,18 +53,13 @@ while 1:
         nodeid,temp,humid,voltage=parseLine(linestr)
         if nodeid:
             params = ("{temp:%.2f,humid:%.2f,voltage:%.2f}"%(temp,humid,voltage))
-            #print params
+            print params
             print "nodeid:"+str(nodeid)
             # Send to emoncms
             conn.connect()
             conn.request("GET", "/"+emoncmspath+"/input/post.json?&node="+str(nodeid)+"&json="+params+"&apikey="+apikey)
             response = conn.getresponse()
             print response.read()
-            conn2.connect()
-            conn2.request("GET", "/"+emoncmspath+"/input/post.json?&node="+str(nodeid)+"&json="+params+"&apikey="+apikey2)
-            response2 = conn2.getresponse()
-            print response2.read()
-
     except KeyboardInterrupt:
         raise
     except Exception as e:
