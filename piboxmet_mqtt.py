@@ -12,6 +12,7 @@ Sends data on mqtt
 '''
 
 import serial
+import http.client as httpc
 import time
 import paho.mqtt.client as mqtt
 import json
@@ -35,6 +36,11 @@ def connect_mqtt():
 
 # Set this to the serial port of your emontx and baud rate, 9600 is standard emontx baud rate
 ser = serial.Serial(port='/dev/ttyS0', baudrate = 9600, timeout = 1)
+
+domain = "rb3met.local"
+emoncmspath = "emoncms"
+apikey = "2eba96e51f6b41534f52110ad063b0c8"
+conn = httpc.HTTPConnection(domain)
 
 def parseLine(linestr):
     nodeid = None
@@ -66,13 +72,13 @@ while 1:
         linestr = line_bytes.decode("utf-8").rstrip()
         nodeid,temp,humid,voltage=parseLine(linestr)
         if nodeid:
-            #params = ("{temp:%.2f,humid:%.2f,voltage:%.2f}"%(temp,humid,voltage))
+            params = ("{temp:%.2f,humid:%.2f,voltage:%.2f}"%(temp,humid,voltage))
             #print params
             #print "nodeid:"+str(nodeid)
             # Send to emoncms
-            #conn.connect()
-            #conn.request("GET", "/"+emoncmspath+"/input/post.json?&node="+str(nodeid)+"&json="+params+"&apikey="+apikey)
-            #response = conn.getresponse()
+            conn.connect()
+            conn.request("GET", "/"+emoncmspath+"/input/post.json?&node="+str(nodeid)+"&json="+params+"&apikey="+apikey)
+            response = conn.getresponse()
             #print response.read()
             #conn2.connect()
             #conn2.request("GET", "/"+emoncmspath+"/input/post.json?&node="+str(nodeid)+"&json="+params+"&apikey="+apikey2)
