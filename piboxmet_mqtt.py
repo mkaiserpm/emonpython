@@ -42,6 +42,8 @@ emoncmspath = "emoncms"
 apikey = "2eba96e51f6b41534f52110ad063b0c8"
 #conn = httpc.HTTPConnection(domain)
 
+node_to_name = {16:"Aussen",17:"Garage",18:"Hasenstall"}
+
 def parseLine(linestr):
     nodeid = None
     temp = 0
@@ -74,7 +76,7 @@ while 1:
         if nodeid:
             if mqtt_connected:
                 print("publishing mqtt")
-                params_mqtt = {"temp":temp,"humid":humid, "voltage":voltage, "timesend":time.time()}
+                params_mqtt = {"nodeid":nodeid,"name":node_to_name[nodeid],"temp":temp,"humid":humid, "voltage":voltage, "timesend":time.time()}
                 client.publish(mqtt_topic+"/{}".format(nodeid),payload=json.dumps(params_mqtt))
             params = ("{temp:%.2f,humid:%.2f,voltage:%.2f}"%(temp,humid,voltage))
             #print params
